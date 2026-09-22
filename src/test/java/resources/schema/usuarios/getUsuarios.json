@@ -1,0 +1,6 @@
+{
+    "200": {
+                "quantidade": "#number",
+                "usuarios": "#[] usuario"
+    }
+}
