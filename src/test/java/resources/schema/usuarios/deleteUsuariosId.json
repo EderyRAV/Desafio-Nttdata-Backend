@@ -5,5 +5,8 @@
     "400": {
     "message": "#string",
     "idCarrinho": "#string"
+    },
+    "405": {
+    "message": "#string"
     }
 }

@@ -1,6 +1,6 @@
 {
     "200": {
                 "quantidade": "#number",
-                "usuarios": "#[] usuario"
+                "usuarios": "#[] usuarioSchema"
     }
 }
