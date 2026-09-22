@@ -7,11 +7,7 @@ Feature: Listar usuarios
     * def schemaRequest = read ("classpath:resources/schema/usuarios/getUsuarios.json")
     * def baseRequest = read ("classpath:resources/request/postUsuarios.json")
     * def correoAux = java.util.UUID.randomUUID().toString() + '@qa.com.br'
-    # FIX: aqui habia "* def usuario = call read('postUsuarios.feature@smoke')" + "* def id = usuario.id",
-    # sin usarse en ningun escenario de este archivo (creaba un usuario de mas en cada corrida) y ademas
-    # colisionaba con el nombre que pide el schema: "usuarios": "#[] usuario" en getUsuarios.json
-    # terminaba comparando cada elemento contra ESTE "usuario" (el resultado del call), no contra
-    # usuarioSchema -> por eso getUsuarios.json ahora apunta a "#[] usuarioSchema" (linea de arriba).
+
 
 @smoke
 Scenario: verificar que el servicio esté disponible
@@ -45,6 +41,4 @@ Given path 'usuarios'
 And param paramInventadoQA = 'xyz'
 When method GET
 Then status 400
-# FIX: era "response.message" pero ese campo no existe en esta respuesta ("actual path does
-# not exist"). La API devuelve el error bajo la clave del propio parametro invalido, no bajo "message".
 And match response.paramInventadoQA == "paramInventadoQA não é permitido"

@@ -7,9 +7,6 @@ Feature: modificar usuarios
     * def schemaRequest = read ("classpath:resources/schema/usuarios/putUsuariosId.json")
     * def usuario = call read('postUsuarios.feature@smoke')
     * def id = usuario.id 
-    # correoAux/correoOtro YA incluyen el dominio '@qa.com.br' -> no se le vuelve a concatenar
-    # en los escenarios de abajo (eso generaba "xxx@qa.com.br@qa.com.br", invalido, y la API
-    # respondia 400 "email deve ser um email válido" en vez del 200/201 esperado).
     * def correoAux = java.util.UUID.randomUUID().toString() + '@qa.com.br'
     * def correoOtro = java.util.UUID.randomUUID().toString() + '@qa.com.br'
 

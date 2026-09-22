@@ -19,10 +19,6 @@ And match response == schemaRequest['200']
 
 @happy-path
 Scenario: verificar que se obtienen los datos correctos de un usuario existente
-# FIX: usaba el "id" del Background (creado por postUsuarios.feature@smoke, que genera SU
-# PROPIO correo interno) pero comparaba contra el "correoAux" de ESTE archivo -> nunca
-# coincidian (2 UUIDs distintos). Esta prueba necesita controlar sus propios datos porque
-# valida contenido especifico, asi que crea su propio usuario en vez de reusar el generico.
 Given copy customRequest = baseRequest
 * set customRequest.nome = 'Usuario Consulta QA'
 * set customRequest.email = correoAux
@@ -54,8 +50,6 @@ Scenario Outline: verificar la respuesta cuando el id no tiene el formato espera
 Given path 'usuarios', '<id>'
 When method GET
 Then status 400
-# FIX: era "response.message" pero para este caso la API responde bajo la clave "id"
-# (formato invalido), no "message" ("actual path does not exist").
 And match response.id == 'id deve ter exatamente 16 caracteres alfanuméricos'
 Examples:
 |tipo|id|
