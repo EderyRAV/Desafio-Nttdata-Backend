@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estrategia de Pruebas · API de Usuarios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A1420; --panel:#0F1D30; --panel-2:#12233A; --line:rgba(94,200,242,.18);
+  --cyan:#5EC8F2; --mint:#4FD1A5; --coral:#FF6B4D;
+  --text:#E7F1FB; --muted:#7E97B3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#0A1420;--text:#E7F1FB}}
+:root[data-theme="dark"]{--ink:#0A1420;--text:#E7F1FB}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:'JetBrains Mono',monospace; line-height:1.65;
+  background-image:
+    linear-gradient(var(--line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:38px 38px;
+}
+h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:-.01em}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+a{color:var(--cyan)}
+.tag{display:inline-block;font-size:.72rem;padding:2px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);background:rgba(94,200,242,.06)}
+.crosshair{position:relative}
+.crosshair::before,.crosshair::after{content:"";position:absolute;width:14px;height:14px;border:1.5px solid var(--cyan);opacity:.7}
+.crosshair::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.crosshair::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+/* HERO */
+.hero{padding:96px 0 72px;border-bottom:1px solid var(--line)}
+.hero .frame{border:1px solid var(--line);padding:44px 36px;background:linear-gradient(180deg,rgba(94,200,242,.05),transparent)}
+.eyebrow{color:var(--mint);font-size:.8rem;margin:0 0 14px}
+.hero h1{font-size:clamp(2.1rem,5vw,3.4rem);margin:0 0 12px;color:var(--text)}
+.hero p.sub{color:var(--muted);max-width:56ch;margin:0 0 28px;font-size:.95rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.stats div{background:var(--ink);padding:16px 18px}
+.stats .n{font-family:'Space Grotesk';font-size:1.7rem;color:var(--cyan)}
+.stats .l{color:var(--muted);font-size:.72rem}
+
+/* SECTIONS */
+section.block{padding:64px 0;border-bottom:1px solid var(--line)}
+.head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.num{color:var(--cyan);font-family:'Space Grotesk';font-size:.85rem}
+h2{font-size:1.5rem;margin:0;color:var(--text)}
+.lede{color:var(--muted);font-size:.88rem;max-width:64ch;margin:6px 0 34px}
+
+/* RULER */
+.ruler-wrap{overflow-x:auto}
+svg{display:block}
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.zone{border:1px solid var(--line);padding:16px 18px;background:var(--panel)}
+.zone h3{font-family:'Space Grotesk';font-size:.85rem;margin:0 0 6px;color:var(--text)}
+.zone p{margin:0;color:var(--muted);font-size:.82rem}
+.chips{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.chip{font-size:.78rem;padding:5px 11px;border-radius:2px;border:1px solid}
+.chip.ok{color:var(--mint);border-color:var(--mint);background:rgba(79,209,165,.08)}
+.chip.bad{color:var(--coral);border-color:var(--coral);background:rgba(255,107,77,.08)}
+
+/* DECISION TABLE */
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th,td{border:1px solid var(--line);padding:12px 14px;text-align:left;vertical-align:top}
+th{color:var(--mint);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;background:var(--panel-2)}
+td.val{color:var(--cyan)}
+tr:nth-child(even) td{background:var(--panel)}
+.typebadge{font-size:.7rem;color:var(--muted)}
+
+/* STATE DIAGRAM */
+.diagram{background:var(--panel);border:1px solid var(--line);padding:20px 10px}
+.legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:16px;height:2px;display:inline-block}
+
+/* COMBINATION */
+.combo{margin-top:10px}
+.base{border:1px solid var(--cyan);background:var(--panel);padding:18px 20px;max-width:420px}
+.base h3{font-family:'Space Grotesk';margin:0 0 10px;font-size:.9rem;color:var(--cyan)}
+.base ul{margin:0;padding-left:18px;color:var(--muted);font-size:.82rem}
+.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:0;position:relative}
+.branches::before{content:"";display:block;grid-column:1/-1;height:1px;background:var(--line);margin:24px 0}
+.branch{border:1px solid var(--line);padding:16px 18px;background:var(--panel-2)}
+.branch .op{color:var(--coral);font-size:.72rem;display:block;margin-bottom:6px}
+.branch b{color:var(--text);font-size:.9rem;display:block;margin-bottom:4px}
+.branch p{margin:0;color:var(--muted);font-size:.8rem}
+
+/* FOOTER */
+footer{padding:60px 0 100px}
+.pipeline{display:flex;align-items:center;gap:0;margin:24px 0;flex-wrap:wrap}
+.pipe-step{border:1px solid var(--line);padding:10px 16px;font-size:.82rem;color:var(--text);background:var(--panel)}
+.pipe-arrow{color:var(--cyan);padding:0 10px}
+footer p{color:var(--muted);font-size:.85rem;max-width:66ch}
+footer p b{color:var(--text);font-weight:500}
+
+@keyframes draw{to{stroke-dashoffset:0}}
+.flow-path{stroke-dasharray:900;stroke-dashoffset:900;animation:draw 2.4s ease forwards}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="frame crosshair">
+      <p class="eyebrow">ServeRest · Endpoint /usuarios</p>
+      <h1>Estrategia de pruebas<br>como esquema técnico</h1>
+      <p class="sub">Cuatro técnicas de diseño de casos —límites, decisión, transición de estados y combinación— aplicadas al mismo recurso: el usuario.</p>
+      <div class="stats">
+        <div><div class="n">4</div><div class="l">técnicas de diseño</div></div>
+        <div><div class="n">4</div><div class="l">filas en tabla de decisión</div></div>
+        <div><div class="n">3</div><div class="l">puntos de contacto</div></div>
+        <div><div class="n">16</div><div class="l">chars exigidos en _id</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="block" id="limites">
+  <div class="wrap">
+    <div class="head"><span class="num">01</span><h2>Límites y agrupaciones</h2></div>
+    <p class="lede">El <code>_id</code> exige exactamente 16 caracteres alfanuméricos. Se prueban los bordes del rango, no solo el centro.</p>
+
+    <div class="ruler-wrap">
+      <svg viewBox="0 0 900 130" width="100%" height="130" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="70" x2="860" y2="70" stroke="#1B3A5C" stroke-width="2"/>
+        <!-- muy corto: 6 -->
+        <circle cx="120" cy="70" r="6" fill="#0A1420" stroke="#FF6B4D" stroke-width="2"/>
+        <text x="120" y="50" fill="#FF6B4D" font-size="12" text-anchor="middle" font-family="JetBrains Mono">6</text>
+        <text x="120" y="98" fill="#7E97B3" font-size="11" text-anchor="middle" font-family="JetBrains Mono">muy corto</text>
+        <!-- válido: 16 -->
+        <rect x="330" y="55" width="70" height="30" fill="rgba(79,209,165,.1)" stroke="#4FD1A5"/>
+        <circle cx="365" cy="70" r="6" fill="#0A1420" stroke="#4FD1A5" stroke-width="2"/>
+        <text x="365" y="34" fill="#4FD1A5" font-size="12" text-anchor="middle" font-family="JetBrains Mono">16</text>
+        <text x="365" y="112" fill="#7E97B3" font-size="11" text-anchor="middle" font-family="JetBrains Mono">formato válido</text>
+        <!-- muy largo: 100 -->
+        <circle cx="760" cy="70" r="6" fill="#0A1420" stroke="#FF6B4D" stroke-width="2"/>
+        <text x="760" y="50" fill="#FF6B4D" font-size="12" text-anchor="middle" font-family="JetBrains Mono">100</text>
+        <text x="760" y="98" fill="#7E97B3" font-size="11" text-anchor="middle" font-family="JetBrains Mono">muy largo</text>
+      </svg>
+    </div>
+
+    <div class="chips">
+      <span class="chip ok">caracteres especiales dentro de los 16 → probado</span>
+    </div>
+
+    <div class="zones">
+      <div class="zone"><h3>Formato válido, no registrado</h3><p>16 caracteres alfanuméricos, id que no existe en base → 400/404 según endpoint.</p></div>
+      <div class="zone"><h3>Formato inválido</h3><p>Longitud incorrecta o caracteres fuera de dominio → rechazo antes de buscar el registro.</p></div>
+    </div>
+
+    <p class="lede" style="margin:28px 0 8px">Mismo principio aplicado a <code>administrador</code>: dominio cerrado de dos valores.</p>
+    <div class="chips">
+      <span class="chip ok">"true"</span><span class="chip ok">"false"</span><span class="chip bad">"hola"</span>
+    </div>
+    <div class="chips" style="margin-top:16px">
+      <span class="tag">getUsuariosId.feature · @fields</span>
+      <span class="tag">deleteUsuariosId.feature · @fields</span>
+      <span class="tag">postUsuarios.feature · @data-type</span>
+      <span class="tag">putUsuariosId.feature · @data-type</span>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="decision">
+  <div class="wrap">
+    <div class="head"><span class="num">02</span><h2>Tabla de decisión</h2></div>
+    <p class="lede">Campo × tipo de dato inválido en el body. Cada fila es una combinación con su resultado esperado.</p>
+    <table>
+      <tr><th>Campo</th><th>Valor enviado</th><th>Tipo</th><th>Resultado esperado</th></tr>
+      <tr><td>email</td><td class="val">132300</td><td class="typebadge">numérico</td><td>error: debe ser string</td></tr>
+      <tr><td>nome</td><td class="val">67</td><td class="typebadge">numérico</td><td>error: debe ser string</td></tr>
+      <tr><td>password</td><td class="val">false</td><td class="typebadge">booleano</td><td>error: debe ser string</td></tr>
+      <tr><td>administrador</td><td class="val">"hola"</td><td class="typebadge">string inválido</td><td>error: debe ser 'true'/'false'</td></tr>
+    </table>
+    <div class="chips" style="margin-top:16px">
+      <span class="tag">postUsuarios.feature · @data-type</span>
+      <span class="tag">putUsuariosId.feature · @data-type</span>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="combinacion">
+  <div class="wrap">
+    <div class="head"><span class="num">03</span><h2>Combinación — expansión lineal</h2></div>
+    <p class="lede">Desde un payload válido se varía un solo campo por caso, para que un fallo señale exactamente qué regla se rompió.</p>
+    <div class="combo">
+      <div class="base">
+        <h3>Happy path — payload base</h3>
+        <ul><li>email</li><li>nome</li><li>password</li><li>administrador</li></ul>
+      </div>
+      <div class="branches">
+        <div class="branch"><span class="op">quitar 1 campo</span><b>"obrigatório"</b><p>El campo ausente dispara el mensaje de campo requerido.</p></div>
+        <div class="branch"><span class="op">vaciar 1 campo</span><b>"branco"</b><p>String vacío se distingue de campo ausente.</p></div>
+        <div class="branch"><span class="op">cambiar tipo</span><b>tipo esperado</b><p>Cada campo, con el tipo de la tabla de decisión.</p></div>
+      </div>
+    </div>
+    <div class="chips" style="margin-top:22px">
+      <span class="tag">postUsuarios.feature</span>
+      <span class="tag">putUsuariosId.feature</span>
+      <span class="tag">mismo patrón replicado en ambos</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="head"><span class="num">·</span><h2>Cómo se registran los resultados</h2></div>
+    <div class="pipeline">
+      <div class="pipe-step">status</div><span class="pipe-arrow">→</span>
+      <div class="pipe-step">schema</div><span class="pipe-arrow">→</span>
+      <div class="pipe-step">contenido</div>
+    </div>
+    <p>Cada escenario valida hasta <b>3 puntos de contacto</b>. <code>@smoke</code> es la única excepción, con 2. El schema se valida solo contra lo documentado en <b>swagger.json</b>; lo que queda fuera de contrato se compara por igualdad exacta contra la respuesta real de la API.</p>
+    <p style="margin-top:14px">Taxonomía completa de tags: comentarios de cada <code>.feature</code>.</p>
+  </div>
+</footer>
+
+</body>
+</html>
